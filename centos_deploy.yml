@@ -1,0 +1,9 @@
+---
+
+- hosts:
+  - master
+  - worker
+  remote_user: root
+  become: True
+  roles:
+  - centos_init

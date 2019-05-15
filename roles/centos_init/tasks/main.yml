@@ -1,0 +1,79 @@
+---
+
+- name: Set hostname
+  hostname:
+    name: "kube-{{ group_names[0] }}{{ groups[group_names[0]].index(inventory_hostname)+1 }}"
+
+- name: Disable firewall
+  systemd:
+    name: firewalld
+    state: stopped
+    enabled: no
+
+- name: Update Packages
+  yum:
+    name: '*'
+    state: latest
+
+- name: Install packages
+  yum:
+    name:
+    - yum-utils
+    - device-mapper-persistent-data
+    - lvm2
+    state: present
+
+- name: Add Docker-CE repo
+  get_url:
+    url: https://download.docker.com/linux/centos/docker-ce.repo
+    dest: /etc/yum.repos.d/docker-ce.repo
+
+- name: Create dir for docker config
+  file:
+    path: /etc/docker
+    state: directory
+
+- name: Add Docker config file
+  copy:
+    src: daemon.json
+    dest: /etc/docker/daemon.json
+
+- name: Install Docker-CE
+  yum:
+    name: docker-ce
+    state: present
+
+- name: Start Docker and enbale bootup
+  systemd:
+    name: docker.service
+    state: started
+    enabled: yes
+
+- name: Add kubernetes repo
+  copy:
+    src: kubernetes.repo
+    dest: /etc/yum.repos.d/kubernetes.repo
+
+- name: Disable SELinux
+  selinux:
+    state: disabled
+
+- name: Modify SELinux config
+  replace:
+    path: /etc/selinux/config
+    regexp: '^SELINUX=enforcing$'
+    replace: 'SELINUX=permissive'
+
+- name: Install kubernetes
+  yum:
+    name:
+    - kubelet
+    - kubeadm
+    - kubectl
+    disable_excludes: kubernetes
+
+- name: Disable devices and files for paging and swapping
+  shell: swapoff -a
+
+- name: Reboot
+  reboot:
