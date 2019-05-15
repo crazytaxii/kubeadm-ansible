@@ -72,8 +72,8 @@
     - kubectl
     disable_excludes: kubernetes
 
-- name: Disable devices and files for paging and swapping
-  shell: swapoff -a
-
 - name: Reboot
   reboot:
+
+- name: Disable devices and files for paging and swapping
+  shell: swapoff -a
