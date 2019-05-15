@@ -12,7 +12,7 @@
 
 - name: Update Packages
   yum:
-    name: '*'
+    name: *
     state: latest
 
 - name: Install packages
@@ -64,7 +64,7 @@
     regexp: '^SELINUX=enforcing$'
     replace: 'SELINUX=permissive'
 
-- name: Install kubernetes
+- name: Install Kubernetes
   yum:
     name:
     - kubelet

@@ -1,0 +1,6 @@
+---
+
+- name: Push Kubeadm initialization config file
+  copy:
+    src: kubeadm.yaml
+    dest: ~/kubeadm.yaml
