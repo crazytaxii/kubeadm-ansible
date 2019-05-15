@@ -12,7 +12,7 @@
 
 - name: Update Packages
   yum:
-    name: *
+    name: "*"
     state: latest
 
 - name: Install packages

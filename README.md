@@ -25,3 +25,9 @@ your_worker2_ip
 ```bash
 $ ansible-playbook -i inventory/kubernetes.yml.example centos_deploy.yml
 ```
+
+### Ubuntu
+
+```bash
+$ ansible-playbook -i inventory/kubernetes.yml.example ubuntu_deploy.yml
+```
