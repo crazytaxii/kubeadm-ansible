@@ -7,7 +7,7 @@ Hardware recommandation:
 + 64bit Linux OS
 + Access to the INTERNET
 
-Copy inventory/kubernetes.yml.example to inventory/kubernetes.yml and replace IPs.
+Copy inventory/kubernetes.example to inventory/kubernetes and replace IPs.
 
 ```
 [master]
@@ -23,11 +23,11 @@ your_worker2_ip
 ### CentOS
 
 ```bash
-$ ansible-playbook -i inventory/kubernetes.yml.example centos_deploy.yml
+$ ansible-playbook -i inventory/kubernetes centos_deploy.yml
 ```
 
 ### Ubuntu
 
 ```bash
-$ ansible-playbook -i inventory/kubernetes.yml.example ubuntu_deploy.yml
+$ ansible-playbook -i inventory/kubernetes ubuntu_deploy.yml
 ```
