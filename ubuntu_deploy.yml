@@ -7,9 +7,3 @@
   become: True
   roles:
   - ubuntu_init
-
-- hosts: master
-  remote_user: root
-  become: True
-  roles:
-  - deploy_pre

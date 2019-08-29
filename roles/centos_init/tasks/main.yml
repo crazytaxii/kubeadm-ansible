@@ -9,6 +9,7 @@
     name: firewalld
     state: stopped
     enabled: no
+  ignore_errors: yes
 
 - name: Update Packages
   yum:
@@ -38,16 +39,37 @@
     src: daemon.json
     dest: /etc/docker/daemon.json
 
-- name: Install Docker-CE
+- name: Update cache
   yum:
-    name: docker-ce
+    update_cache: yes
+
+- name: Install Docker
+  yum:
+    name:
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
     state: present
 
-- name: Start Docker and enbale bootup
+- name: Create dir docker.service.d
+  file:
+    path: /etc/systemd/system/docker.service.d
+    state: directory
+
+- name: Start Docker
   systemd:
     name: docker.service
+    daemon_reload: yes
     state: started
     enabled: yes
+
+- name: Setup required sysctl params
+  copy:
+    src: 99-kubernetes-cri.conf
+    dest: /etc/sysctl.d/99-kubernetes-cri.conf
+
+- name: Load
+  shell: sysctl --system
 
 - name: Add kubernetes repo
   copy:
@@ -72,8 +94,10 @@
     - kubectl
     disable_excludes: kubernetes
 
-- name: Reboot
-  reboot:
+- name: Enable bootup for kubelet
+  systemd:
+    name: kubelet
+    enabled: yes
 
 - name: Disable devices and files for paging and swapping
   shell: swapoff -a
