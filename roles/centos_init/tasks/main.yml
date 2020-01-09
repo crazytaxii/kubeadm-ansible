@@ -1,8 +1,7 @@
 ---
-
 - name: Set hostname
   hostname:
-    name: "kube-{{ group_names[0] }}{{ groups[group_names[0]].index(inventory_hostname)+1 }}"
+    name: "kube-{{ group_names[0] }}-{{ groups[group_names[0]].index(inventory_hostname)+1 }}"
 
 - name: Disable firewall
   systemd:
@@ -19,15 +18,16 @@
 - name: Install packages
   yum:
     name:
-    - yum-utils
-    - device-mapper-persistent-data
-    - lvm2
+      - yum-utils
+      - device-mapper-persistent-data
+      - lvm2
     state: present
 
 - name: Add Docker-CE repo
   get_url:
     url: https://download.docker.com/linux/centos/docker-ce.repo
     dest: /etc/yum.repos.d/docker-ce.repo
+  ignore_errors: yes
 
 - name: Create dir for docker config
   file:
@@ -46,9 +46,9 @@
 - name: Install Docker
   yum:
     name:
-    - docker-ce
-    - docker-ce-cli
-    - containerd.io
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
     state: present
 
 - name: Create dir docker.service.d
@@ -68,7 +68,7 @@
     src: 99-kubernetes-cri.conf
     dest: /etc/sysctl.d/99-kubernetes-cri.conf
 
-- name: Load
+- name: Reload settings from all system configuration files
   shell: sysctl --system
 
 - name: Add kubernetes repo
@@ -83,15 +83,15 @@
 - name: Modify SELinux config
   replace:
     path: /etc/selinux/config
-    regexp: '^SELINUX=enforcing$'
-    replace: 'SELINUX=permissive'
+    regexp: "^SELINUX=enforcing$"
+    replace: "SELINUX=permissive"
 
 - name: Install Kubernetes
   yum:
     name:
-    - kubelet
-    - kubeadm
-    - kubectl
+      - kubelet
+      - kubeadm
+      - kubectl
     disable_excludes: kubernetes
 
 - name: Enable bootup for kubelet
@@ -101,3 +101,9 @@
 
 - name: Disable devices and files for paging and swapping
   shell: swapoff -a
+
+- name: Disable SWAP in fstab since kubernetes can't work with swap enabled
+  replace:
+    path: /etc/fstab
+    regexp: '^([^#].*?\sswap\s+sw\s+.*)$'
+    replace: '# \1'
